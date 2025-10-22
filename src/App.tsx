@@ -5,11 +5,16 @@ function App() {
   const [count, setCount] = useState(0)
 
   return (
-    <>
-
-      <h1>Vite + React</h1>
-
-    </>
+      <div className='flex justify-center items-center p-6 bg-blue-50'>
+          <div className="container ">
+              <p>Vite + React</p>
+              <button
+                  className="btn btn-primary"
+                  onClick={() => setCount((count) => count + 1)}>
+                  count is {count}
+              </button>
+          </div>
+      </div>
   )
 }
 
