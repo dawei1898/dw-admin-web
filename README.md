@@ -1,5 +1,19 @@
 # dw-admin-web
 
+
+
+安装依赖
+```shell
+npm install
+```
+
+启动项目
+```shell
+npm run dev
+
+```
+
+
 https://cn.vitejs.dev/
 创建 vite 项目
 ```shell
@@ -42,7 +56,7 @@ import '@ant-design/v5-patch-for-react-19';
 npm install @ant-design/pro-components
 ```
 
-Axios
+Http请求库 axios
 ```shell
 npm install axios
 ```
@@ -50,4 +64,9 @@ npm install axios
 ahooks
 ```shell
 npm install ahooks
+```
+
+全局状态管理库 zustand
+```bash
+npm install zustand
 ```
