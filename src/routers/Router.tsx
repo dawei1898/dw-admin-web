@@ -4,8 +4,10 @@ import App from "../App.tsx";
 import NotFoundPage from "../pages/error/404/NotFound.tsx";
 import ErrorPage from "../pages/error/500/Error.tsx";
 import NotAuthorizedPage from "../pages/error/403/NotAuthorized.tsx";
+import RegisterIndex from "../pages/auth/register";
+import LoginIndex from "../pages/auth/login";
 
-import LoginPage from "../pages/auth/login/LoginPage.tsx";
+
 
 /**
  * 根据错误类型跳转到对应的页面
@@ -59,10 +61,12 @@ const Router = createBrowserRouter([
     },
     {
         path: "/login",
-        Component: LoginPage,
+        Component: LoginIndex,
     },
-
-
+     {
+         path: "/register",
+          Component: RegisterIndex,
+     }
 
 ])
 

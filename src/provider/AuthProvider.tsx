@@ -1,4 +1,4 @@
-import {TOKEN_KEY, type User, USER_KEY} from "../types/auth.ts";
+import {type LoginParam, type RegisterParam, TOKEN_KEY, type User, USER_KEY} from "../types/auth.ts";
 import {createContext, useContext, useEffect, useState} from "react";
 import {loginAPI, logoutAPI, registerAPI} from "../apis/authApi.ts";
 import {getLoginUserAPI} from "../apis/userApi.ts";
@@ -8,8 +8,8 @@ interface AuthContextType {
     user: User | null;
     isLogin: boolean;
     loading: boolean;
-    register: (username: string, password: string) => Promise<void>;
-    login: (username: string, password: string) => Promise<void>;
+    register: (param:  RegisterParam) => Promise<void>;
+    login: (param: LoginParam) => Promise<void>;
     logout: () => Promise<void>;
     clearUser: () => void;
 }
@@ -67,14 +67,12 @@ export const AuthProvider = (
 
     /**
      * 处理注册
-     * @param username
-     * @param password
      */
-    const handleRegister = async (username: string, password: string) => {
+    const handleRegister = async (param:  RegisterParam) => {
         try {
             setLoading(true)
 
-            const resp = await registerAPI(username, password);
+            const resp = await registerAPI(param);
             if (resp.code === 200) {
                 console.log('注册成功')
             } else {
@@ -90,13 +88,11 @@ export const AuthProvider = (
 
     /**
      * 处理登录
-     * @param username
-     * @param password
      */
-    const handleLogin = async (username: string, password: string) => {
+    const handleLogin = async (param: LoginParam) => {
         try {
             setLoading(true)
-            const resp = await loginAPI(username, password);
+            const resp = await loginAPI(param);
             if (resp.code === 200) {
                 console.log('登录成功')
                 const token = resp.data;

@@ -1,18 +1,19 @@
 import {axioser} from "../utils/httpUtil.ts";
 import type {ApiResponse} from "../types";
+import type {LoginParam, RegisterParam} from "../types/auth.ts";
 
 /**
  * 注册接口
  */
-export function registerAPI(username: string, password: string) {
-    return axioser.post<any, ApiResponse<void>>('/user/register', {username, password})
+export function registerAPI(param:  RegisterParam) {
+    return axioser.post<any, ApiResponse<void>>('/user/register', param)
 }
 
 /**
  * 登录接口
  */
-export function loginAPI(username: string, password: string) {
-    return axioser.post<any, ApiResponse<string>>('/user/login', {username, password})
+export function loginAPI(param: LoginParam) {
+    return axioser.post<any, ApiResponse<string>>('/user/login', param)
 }
 
 /**
