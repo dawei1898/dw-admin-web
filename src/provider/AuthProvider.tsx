@@ -1,7 +1,8 @@
-import {type LoginParam, type RegisterParam, TOKEN_KEY, type User, USER_KEY} from "../types/auth.ts";
-import {createContext, useContext, useEffect, useState} from "react";
+import {type LoginParam, type RegisterParam, type User} from "../types/auth.ts";
+import {createContext, useContext, useState} from "react";
 import {loginAPI, logoutAPI, registerAPI} from "../apis/authApi.ts";
 import {getLoginUserAPI} from "../apis/userApi.ts";
+import {useUserStore} from "../stores/userStore.ts";
 
 
 interface AuthContextType {
@@ -39,30 +40,8 @@ export const AuthProvider = (
     {children}: { children: React.ReactNode }
 ) => {
 
-    const [user, setUser] = useState<User | null>(null)
+    const {user, setUser} = useUserStore();
     const [loading, setLoading] = useState(false)
-
-    /**
-     * 初始化加载用户信息
-     */
-    useEffect(() => {
-        try {
-            console.log('初始化加载用户信息')
-            setLoading(true)
-            // 从 localStore 获取用户信息
-            const userInfo = localStorage.getItem(USER_KEY);
-            if (userInfo) {
-                // 解析 JSON
-                const user: User = JSON.parse(userInfo);
-                setUser(user)
-            }
-        } catch (e) {
-            console.log('从 localStore 获取用户信息失败：', e)
-        } finally {
-            setLoading(false)
-        }
-
-    }, [])
 
 
     /**
@@ -96,8 +75,12 @@ export const AuthProvider = (
             if (resp.code === 200) {
                 console.log('登录成功')
                 const token = resp.data;
-                // token 存在 localStore
-                localStorage.setItem(TOKEN_KEY, token)
+
+                const userInfo = {
+                    name: '',
+                    token: token,
+                }
+                setUser(userInfo)
 
                 // 获取登录用户信息
                 await getLoginUserAPI()
@@ -114,8 +97,6 @@ export const AuthProvider = (
                             token: token,
                         }
                         setUser(userInfo)
-                        // person 存在 localStore
-                        localStorage.setItem(USER_KEY, JSON.stringify(resp.data))
                     })
             } else {
                 throw new Error(resp.message);
@@ -151,9 +132,6 @@ export const AuthProvider = (
 
     const handleClearUser = () => {
         setUser(null)
-        // 清除 localStore
-        localStorage.removeItem(USER_KEY)
-        localStorage.removeItem(TOKEN_KEY)
     }
 
 

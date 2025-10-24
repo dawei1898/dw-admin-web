@@ -6,6 +6,7 @@ import ErrorPage from "../pages/error/500/Error.tsx";
 import NotAuthorizedPage from "../pages/error/403/NotAuthorized.tsx";
 import RegisterIndex from "../pages/auth/register";
 import LoginIndex from "../pages/auth/login";
+import HomeLayout from "../pages/home/HomeLayout.tsx";
 
 
 
@@ -29,7 +30,7 @@ function GeneralErrorBoundary() {
 const Router = createBrowserRouter([
     {
         path: "/",
-        //Component: HomeLayout,
+        Component: HomeLayout,
         errorElement: <GeneralErrorBoundary/>,
         handle: {breadcrumb: "首页"},
         children: [

@@ -1,12 +1,15 @@
 import {create} from "zustand";
-import {persist} from "zustand/middleware/persist";
+import {persist} from "zustand/middleware";
+
+type Theme = 'dark' | 'light'
 
 type State = {
-    light: boolean;
+    theme: Theme;
+    dark: boolean;
 }
 
 type Action = {
-    changeLight: (change: boolean) => void;
+    toggleTheme: () => void;
 }
 
 /**
@@ -15,13 +18,21 @@ type Action = {
 export const useThemeStore = create<State & Action>()(
     persist(
         (set) => ({
-            light: true,
-            changeLight: (newValue: boolean) => set({light: newValue}),
+            theme: 'light',
+            dark: false,
+            toggleTheme: () => set((state) => {
+                const newTheme = state.theme === 'light' ? 'dark' : 'light';
+                return {
+                    theme: newTheme,
+                    dark: newTheme === 'dark'
+                };
+            }),
         }),
         {
             name: 'theme', // localStorage中的键名
             partialize: (state) => ({ // 只保存需要的字段
-                light: state.light,
+                theme: state.theme,
+                dark: state.dark,
             })
         }
     )

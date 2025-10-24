@@ -1,5 +1,5 @@
 import axios from "axios";
-import {TOKEN_KEY} from "../types/auth.ts";
+import {useUserStore} from "../stores/userStore.ts";
 
 
 /**
@@ -17,10 +17,11 @@ export const axioser = axios.create({
 axioser.interceptors.request.use(
     // 拦截请求，增加token
     config => {
-        const token = localStorage.getItem(TOKEN_KEY)
-        if (token) {
+        // 直接从store实例获取状态，而不是通过hook
+        const userStore = useUserStore.getState();
+        if (userStore.user?.token) {
             //console.log(`token : ${token}`)
-            config.headers['Authorization'] = `Bearer ${token}`
+            config.headers['Authorization'] = `Bearer ${userStore.user.token}`
         }
         return config
     },
@@ -36,10 +37,9 @@ axioser.interceptors.request.use(
 axioser.interceptors.response.use(
     // 成功返回
     resp => {
-        //console.log(`response: ${JSON.stringify(res.data)}`)
         if (resp.data.code === 401) {
             // 清楚 tokenn
-            localStorage.removeItem(TOKEN_KEY)
+            useUserStore.getState().setUser(null)
             console.log('token失效，转跳到登录页')
             window.location.href = '/login'
         }
