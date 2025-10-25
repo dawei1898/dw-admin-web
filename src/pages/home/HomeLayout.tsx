@@ -8,6 +8,7 @@ import {useThemeStore} from "../../stores/themeStore.ts";
 import HeaderActions from "../../components/HeaderActions.tsx";
 import Breadcrumbs from "../../components/Breadcrumbs.tsx";
 import Menus from "../../components/Menus.tsx";
+import {Outlet} from "react-router";
 
 
 const {useToken} = theme;
@@ -19,7 +20,7 @@ const {useToken} = theme;
  */
 const HomeLayout = () => {
     const {token} = useToken();
-    const {theme, dark} = useThemeStore();
+    const {dark} = useThemeStore();
 
 
 
@@ -41,67 +42,34 @@ const HomeLayout = () => {
                     layout='mix'
                     siderWidth={220}
                     logo={<Logo/>}
+                    // logo 标题
                     headerTitleRender={(logo, title, props) => {
                         return <LogoTitle/>
                     }}
+                    // 顶部操作
                     actionsRender={(props) => {
                         return <HeaderActions props={props}/>
                     }}
+                    // 用户头像
                     avatarProps={{
                         render: (props, dom) => {
                             return <UserDropMenu/>
                         }
                     }}
+                    // 侧边栏菜单
                     menuContentRender={(props) => {
                         return <Menus/>
                     }}
-
                 >
 
                     <PageContainer
-                        className='px-4'
+                        // 面包屑
                         breadcrumbRender={(route) => {
                             return <Breadcrumbs/>
                         }}
-                        //title="页面标题"
-                        //subTitle="简单的描述"
-                        /*extra={[
-                            <Button key="3">操作</Button>,
-                            <Button key="2">操作</Button>,
-                            <Button
-                                key="1"
-                                type="primary"
-                                onClick={() => {
-                                    setNum(num > 0 ? 0 : 40);
-                                }}
-                            >
-                                主操作
-                            </Button>,
-                        ]}*/
-
-                        /*footer={[
-                            <Button key="3">重置</Button>,
-
-                        ]}*/
-
                     >
-                        <ProCard
-                            style={{
-                                height: '20vh',
-                                minHeight: 100,
-                            }}
-                        >
-                            <div />
-                        </ProCard>
-
-                        <ProCard
-                            style={{
-                                height: '80vh',
-                                minHeight: 100,
-                            }}
-                        >
-                            <div />
-                        </ProCard>
+                        {/* 路由切入点 */}
+                        <Outlet/>
                     </PageContainer>
 
                 </ProLayout>

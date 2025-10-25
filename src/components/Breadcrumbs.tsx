@@ -25,7 +25,7 @@ const Breadcrumbs = () => {
             const title: React.ReactNode  = match.handle!.breadcrumb;
 
             // 最后一个 item 不需要链接
-            const isLast = index === matches.length - 1;
+            const isLast = index === matches.length - 2;
 
             return {
                 key: match.pathname,

@@ -25,8 +25,7 @@ const items: MenuItem[] = [
         children: [
             {
                 key: '1-1',
-                //label: <NavLink to="/dashboard/workbench">工作台</NavLink>,
-                label: '工作台',
+                label: <NavLink to="/dashboard/workbench">工作台</NavLink>,
             },
             {
                 key: '1-2',

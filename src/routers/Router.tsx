@@ -7,6 +7,9 @@ import NotAuthorizedPage from "../pages/error/403/NotAuthorized.tsx";
 import RegisterIndex from "../pages/auth/register";
 import LoginIndex from "../pages/auth/login";
 import HomeLayout from "../pages/home/HomeLayout.tsx";
+import WorkbenchIndex from "../pages/dashboard/workbench/WorkbenchIndex.tsx";
+import AnalysisIndex from "../pages/dashboard/analysis/AnalysisIndex.tsx";
+import HomeIndex from "../pages/home/HomeIndex.tsx";
 
 
 
@@ -32,9 +35,28 @@ const Router = createBrowserRouter([
         path: "/",
         Component: HomeLayout,
         errorElement: <GeneralErrorBoundary/>,
-        handle: {breadcrumb: "首页"},
+        //handle: {breadcrumb: "首页"},
         children: [
-
+            {
+                index: true,
+                Component: HomeIndex,
+            },
+            {
+                path: "dashboard",
+                handle: {breadcrumb: "控制台"},
+                children: [
+                    {
+                        path: "workbench",
+                        Component: WorkbenchIndex,
+                        handle: {breadcrumb: "工作台"},
+                    },
+                    {
+                        path: "analysis",
+                        Component: AnalysisIndex,
+                        handle: {breadcrumb: "分析页"},
+                    },
+                ]
+            },
 
 
         ]
