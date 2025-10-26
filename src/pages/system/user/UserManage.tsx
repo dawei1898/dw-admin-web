@@ -1,11 +1,12 @@
 import React, {useEffect, useRef, useState} from 'react';
 import {type ActionType, type ProColumns, ProTable} from "@ant-design/pro-components";
 import type {UserParam, UserVO} from "../../../types/users.ts";
-import {Button, Divider, message, Popconfirm, Space, Table, type TablePaginationConfig} from "antd";
+import {Button, Divider, message, Popconfirm, Space } from "antd";
 import {DeleteOutlined} from "@ant-design/icons";
-import {deleteUserAPI} from "../../../apis/userApi.ts";
+import {deleteUserAPI, getUserListAPI} from "../../../apis/userApi.ts";
 import {SORT_ASC, SORT_DESC} from "../../../types/constant.ts";
 import AddUserForm from "./AddUserForm.tsx";
+import EditUserForm from "./EditUserForm.tsx";
 
 
 
@@ -16,13 +17,15 @@ import AddUserForm from "./AddUserForm.tsx";
  */
 const UserManage = () => {
     const actionRef = useRef<ActionType>();
+    const [openEdit, setOpenEdit] = useState(false)
+    const [editRecord, setEditRecord] = useState<UserVO>(null)
 
 
     /**
      * 查询用户列表
      */
     const handleRequest = async (params, sort, filter) => {
-        console.log("request params:", params, ", sort: ", sort, ", filter: ", filter)
+        //console.log("request params:", params, ", sort: ", sort, ", filter: ", filter)
 
         let createTimeSort = '';
         let updateTimeSort = '';
@@ -37,7 +40,7 @@ const UserManage = () => {
             updateTimeSort = SORT_DESC;
         }
 
-        const resp = await getUserList({
+        const resp = await getUserListAPI({
             ...params,
             pageNum: params.current,
             pageSize: params.pageSize,
@@ -135,8 +138,8 @@ const UserManage = () => {
 
                 <Space split={<Divider type="vertical"/>}>
                     <div onClick={() => {
+                        setEditRecord(record)
                         setOpenEdit(true)
-                        editForm.setFieldsValue(record)
                     }}>
                         <a>编辑</a>
                     </div>
@@ -160,14 +163,25 @@ const UserManage = () => {
                 </Space>
 
             )
-
-
         },
     ]
 
 
 
     return (<>
+        {/* 编辑用户框 */}
+        <EditUserForm
+            open={openEdit}
+            onOpen={setOpenEdit}
+            record={editRecord}
+            onFinish={async () => {
+                if (actionRef.current) {
+                    await actionRef.current.reload()
+                }
+            }}
+        />
+
+        {/* 用户列表 */}
         <ProTable<UserVO, UserParam>
             actionRef={actionRef}
             columns={columns}
@@ -210,7 +224,7 @@ const UserManage = () => {
                     <PlusOutlined/>
                     添加
                 </Button>,*/
-                <AddUserForm reload={action?.reload}/>,
+                <AddUserForm onFinish={action?.reload}/>,
 
             ]}
             pagination={{

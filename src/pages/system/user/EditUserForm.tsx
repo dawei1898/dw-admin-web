@@ -1,14 +1,15 @@
-import React, {useState} from 'react';
+import React, {useEffect, useState} from 'react';
 import {
+    type ActionType,
     ModalForm,
     ProFormSelect,
     ProFormText
 } from "@ant-design/pro-components";
 import {Button, Form, message} from "antd";
-import type {UserParam} from "../../../types/users.ts";
+import type {UserParam, UserVO} from "../../../types/users.ts";
 import {PlusOutlined} from "@ant-design/icons";
 import {saveUserAPI} from "../../../apis/userApi.ts";
-import {getRoleListAPI, saveUserRoleAPI} from "../../../apis/roleApi.ts";
+import {getRoleListAPI, getUserRoleListAPI, saveUserRoleAPI} from "../../../apis/roleApi.ts";
 import {SORT_ASC, STATUS_ENABLED} from "../../../types/constant.ts";
 import type {RoleParam} from "../../../types/roles.ts";
 
@@ -18,22 +19,61 @@ interface RoleOption extends RoleParam {
 }
 
 
-interface AddUserFormProps {
+interface EditUserFormProps {
+    //trigger: React.ReactNode;
+    open: boolean;
+    onOpen: (open: boolean) => void;
+    record: UserParam;
     onFinish?: () => void;
 }
 
 /**
- * 新增用户弹框表单
+ * 编辑用户弹框表单
  */
-const AddUserForm = ({onFinish}: AddUserFormProps) => {
+const EditUserForm = (
+    {open = false, onOpen , record, onFinish}: EditUserFormProps
+) => {
 
     const [form] = Form.useForm<UserParam>();
     const [messageApi, contextHolder] = message.useMessage();
 
+
     /**
-     * 获取角色列表
+     * 初始化用户信息
      */
-    const getRoleList = async () => {
+    useEffect(() => {
+        console.log("初始化编辑用户框")
+        if (open) {
+            console.log("EditUserForm init record:", record)
+            const userId = record.id;
+            if (userId) {
+                // 查询用户已配置的角色
+                getUserRoleListAPI(userId).then(resp => {
+                    const option = resp.data.map(role => {
+                        return {
+                            label: role.roleName,
+                            value: role.roleCode,
+                            roleCode: role.roleCode,
+                            roleName: role.roleName,
+                        }
+                    })
+                    // 设置表单用户信息
+                    record.roles = option
+                    form.setFieldsValue(record);
+                })
+            }
+        } else {
+            // 关闭弹框
+            form.resetFields()
+        }
+    }, [open]);
+
+
+
+    /**
+     * 初始化获取所有角色选项
+     */
+    const getAllRoleList = async () => {
         return await getRoleListAPI({
             pageNum: 1,
             pageSize: 100,
@@ -55,11 +95,11 @@ const AddUserForm = ({onFinish}: AddUserFormProps) => {
     }
 
     /**
-     * 添加用户
+     * 编辑用户
      */
-    const handleAddUser = async (user: UserParam) => {
+    const handleEditUser = async (user: UserParam) => {
         if (user) {
-            // 新增用户
+            // 保存用户
             const resp = await saveUserAPI(user);
             if (resp.code !== 200) {
                 messageApi.error(resp.message);
@@ -82,6 +122,7 @@ const AddUserForm = ({onFinish}: AddUserFormProps) => {
             }
             messageApi.success('添加成功')
 
+            // 回调，刷新用户列表
             await onFinish?.()
         }
     }
@@ -91,27 +132,25 @@ const AddUserForm = ({onFinish}: AddUserFormProps) => {
         <ModalForm
             style={{padding: '20px 0'}}
             form={form}
-            trigger={
-                <Button type="primary">
-                    <PlusOutlined/>
-                    添加
-                </Button>
-            }
-            title="添加新用户"
+            //trigger={trigger}
+            title="编辑用户"
             width={500}
             layout="horizontal"
             labelCol={{span: 5}}
             wrapperCol={{span: 16}}
             modalProps={{
-                okText: '添加',
+                okText: '保存',
                 cancelText: '取消',
                 destroyOnHidden: true,
             }}
+            open={open}
+            onOpenChange={onOpen}
             onFinish={async (values) => {
-                await handleAddUser(values)
+                await handleEditUser(values)
                 return true
             }}
         >
+            <ProFormText name='id' hidden/>
             <ProFormText
                 colProps={{span: 24}}
                 label='用户名'
@@ -119,13 +158,6 @@ const AddUserForm = ({onFinish}: AddUserFormProps) => {
                 width='md'
                 placeholder='请输入用户名'
                 rules={[{required: true, message: '请输入用户名'}]}
-            />
-            <ProFormText
-                label='密码'
-                name='password'
-                placeholder='请输入密码'
-                fieldProps={{type: 'password'}}
-                rules={[{required: true, min: 6, max: 15, message: '密码长度 6～15'}]}
             />
             <ProFormText
                 label='邮箱'
@@ -148,7 +180,7 @@ const AddUserForm = ({onFinish}: AddUserFormProps) => {
                 label='角色'
                 name='roles'
                 mode='multiple'
-                request={getRoleList}
+                request={getAllRoleList}
                 onChange={(value: string[], option: RoleOption[]) => {
                     // console.log('Select value:', value, ", option:", option)
                     form.setFieldValue('roles', option)
@@ -158,4 +190,4 @@ const AddUserForm = ({onFinish}: AddUserFormProps) => {
     </>);
 };
 
-export default AddUserForm;
+export default EditUserForm;
