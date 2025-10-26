@@ -14,6 +14,9 @@ import UserManageIndex from "../pages/system/user";
 import RoleManageIndex from "../pages/system/role/RoleManageIndex.tsx";
 import ImageIndex from "../pages/file/ImageIndex.tsx";
 import LoginLogIndex from "../pages/system/log/LoginLogIndex.tsx";
+import PersonIndex from "../pages/person/PersonIndex.tsx";
+import PersonCenter from "../pages/person/PersonCenter.tsx";
+import PersonSettings from "../pages/person/PersonSettings.tsx";
 
 
 /**
@@ -97,7 +100,25 @@ const Router = createBrowserRouter([
                          handle: {breadcrumb: "图片管理"},
                      }
                 ]
-            }
+            },
+            {
+                path: "person",
+                Component: PersonIndex,
+                handle: {breadcrumb: "个人页"},
+                children: [
+                    {
+                        path: "center",
+                        Component: PersonCenter,
+                        handle: {breadcrumb: "个人中心"},
+                    },
+                    {
+                        path: "settings",
+                        Component: PersonSettings,
+                        handle: {breadcrumb: "个人设置"},
+                    }
+                ]
+            },
+
         ]
     },
     {
