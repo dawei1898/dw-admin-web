@@ -13,6 +13,7 @@ import HomeIndex from "../pages/home/HomeIndex.tsx";
 import UserManageIndex from "../pages/system/user";
 import RoleManageIndex from "../pages/system/role/RoleManageIndex.tsx";
 import ImageIndex from "../pages/file/ImageIndex.tsx";
+import LoginLogIndex from "../pages/system/log/LoginLogIndex.tsx";
 
 
 /**
@@ -73,7 +74,17 @@ const Router = createBrowserRouter([
                         Component: RoleManageIndex,
                         handle: {breadcrumb: "角色管理"},
                     },
-
+                    {
+                        path: "log",
+                        handle: {breadcrumb: "日志管理"},
+                        children: [
+                            {
+                                path: "login",
+                                Component: LoginLogIndex,
+                                handle: {breadcrumb: "登录日志"},
+                            },
+                        ]
+                    },
                 ]
             },
             {
