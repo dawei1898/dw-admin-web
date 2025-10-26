@@ -103,7 +103,7 @@ const Router = createBrowserRouter([
             },
             {
                 path: "person",
-                Component: PersonIndex,
+                //Component: PersonIndex,
                 handle: {breadcrumb: "个人页"},
                 children: [
                     {

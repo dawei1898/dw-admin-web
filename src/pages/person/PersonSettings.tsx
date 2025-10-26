@@ -1,12 +1,13 @@
 import React, {useEffect, useState} from 'react';
-import {Avatar, Button, Flex, Form, Input, message, Upload} from "antd";
+import {Avatar, Button, Card, Flex, Form, Input, message, Upload} from "antd";
 import {UploadOutlined} from "@ant-design/icons";
 import type {UploadChangeParam, UploadFile} from "antd/es/upload/interface";
 
 import {uploadFileAPI} from "../../apis/fileApi.ts";
 import type {UserParam} from "../../types/users.ts";
 import {getLoginUserAPI, updateUserAPI} from "../../apis/userApi.ts";
-
+import Breadcrumbs from "../../components/Breadcrumbs.tsx";
+import {PageContainer} from "@ant-design/pro-components";
 
 
 /**
@@ -14,6 +15,7 @@ import {getLoginUserAPI, updateUserAPI} from "../../apis/userApi.ts";
  */
 const PersonSettings = () => {
 
+    const [messageApi, contextHolder] = message.useMessage();
     const [form] = Form.useForm();
     const [loading, setLoading] = useState(false)
     const [avatarUrl, setAvatarUrl] = useState('')
@@ -27,14 +29,14 @@ const PersonSettings = () => {
         getLoginUserAPI()
             .then(resp => {
                 if (resp.code !== 200) {
-                    message.error(resp.message);
+                    messageApi.error(resp.message);
                     return
                 }
                 form.setFieldsValue(resp.data);
 
                 setAvatarUrl(resp.data.avatarUrl!)
             }).catch(error => {
-            message.error(error.message);
+            messageApi.error(error.message);
         });
     }
 
@@ -43,10 +45,10 @@ const PersonSettings = () => {
         if (user) {
             const resp = await updateUserAPI(user);
             if (resp.code !== 200) {
-                message.error(resp.message);
+                messageApi.error(resp.message);
                 return
             }
-            message.success('更新成功')
+            messageApi.success('更新成功')
             await handleGetUserInfo()
         }
     }
@@ -60,7 +62,7 @@ const PersonSettings = () => {
             uploadFileAPI(file)
                 .then(resp => {
                     if (resp.code !== 200) {
-                        message.error(resp.message);
+                        messageApi.error(resp.message);
                     } else {
                         const fileUrl = resp.data.url;
                         if (fileUrl) {
@@ -70,84 +72,114 @@ const PersonSettings = () => {
                         }
                     }
                 }).catch(error => {
-                message.error(error.message);
+                messageApi.error(error.message);
             }).finally(() => {
                 setLoading(false)
             });
         }
     };
 
-    return (
-        <div className='h-full p-6 flex flex-col gap-4'>
-            <p>个人设置</p>
-            <div className='max-w-sm'>
-                <Form
-                    layout='vertical'
-                    form={form}
-                    onFinish={handleUpdateUser}
+    /**
+     * 上传展示头像
+     */
+    const AvatarUpload = () => {
+        return (
+            <Flex vertical align={'center'} gap={20} style={{width: 128}}>
+                <Avatar
+                    size={128}
+                    src={avatarUrl}
+                />
+                <Upload
+                    accept='image/*'
+                    showUploadList={false}
+                    beforeUpload={(file) => {
+                        // 以 image/ 开头
+                        if (file.type && file.type.startsWith('image/')) {
+                            return true;
+                        }
+                        messageApi.error('请上传图片文件！');
+                        return false
+                    }}
+                    onChange={async (info: UploadChangeParam<UploadFile>) => {
+                        console.log('file info:', info)
+                        const file = info.file;
+                        if (file.status === 'uploading') {
+                            await handleUploadChange(file)
+                        }
+                    }}
                 >
-                    <Form.Item name='id' hidden />
+                    <Button loading={loading}>
+                        <UploadOutlined/>
+                        更换头像
+                    </Button>
+                </Upload>
+            </Flex>
+        );
+    };
 
-                    <Form.Item
-                        label="头像"
-                        name="avatarUrl"
-                    >
-                        <Flex vertical align={'center'} gap={20} style={{width: 128}} >
-                            <Avatar
-                                size={128}
-                                src={avatarUrl}
-                            />
-                            <Upload
-                                accept='image/*'
-                                showUploadList={false}
-                                beforeUpload={(file) => {
-                                    // 以 image/ 开头
-                                    if (file.type && file.type.startsWith('image/')) {
-                                        return true;
-                                    }
-                                    message.error('请上传图片文件！');
-                                    return false
-                                }}
-                                onChange={async (info: UploadChangeParam<UploadFile>) => {
-                                    console.log('file info:', info)
-                                    const file = info.file;
-                                    if (file.status === 'uploading') {
-                                        await handleUploadChange(file)
-                                    }
-                                }}
+
+    return (
+        <PageContainer
+            breadcrumbRender={(route) => {
+                return <Breadcrumbs/> // 面包屑
+            }}
+        >
+            {contextHolder}
+            <div className='h-full p-6 flex flex-col gap-4'>
+                <Card>
+                    <div className='max-w-sm m-6'>
+                        <Form
+                            layout='vertical'
+                            form={form}
+                            onFinish={handleUpdateUser}
+                        >
+                            <Form.Item name='id' hidden/>
+
+                            <Form.Item label="头像" name="avatarUrl">
+                                <AvatarUpload/>
+                            </Form.Item>
+
+                            <Form.Item
+                                label="用户名"
+                                name="name"
+                                rules={[{required: true, message: '请输入用户名'}]}
                             >
-                                <Button loading={loading}>
-                                    <UploadOutlined/>
-                                    更换头像
+                                <Input disabled/>
+                            </Form.Item>
+
+                            <Form.Item
+                                label='邮箱'
+                                name='email'
+                                rules={[{
+                                    pattern: /^[a-zA-Z0-9_-]+@[a-zA-Z0-9_-]+(\.[a-zA-Z0-9_-]+)+$/,
+                                    message: '请输入正确的邮箱'
+                                }]}
+                            >
+                                <Input placeholder='请输入邮箱'/>
+                            </Form.Item>
+
+                            <Form.Item
+                                label='手机'
+                                name='phone'
+                                rules={[{pattern: /^1[3456789]\d{9}$/, message: '请输入正确的手机号'}]}
+                            >
+                                <Input placeholder='请输入手机号'/>
+                            </Form.Item>
+
+                            <Form.Item>
+                                <Button
+                                    className='mt-6'
+                                    type='primary'
+                                    onClick={form.submit}
+                                >
+                                    更新基本信息
                                 </Button>
-                            </Upload>
-                        </Flex>
-                    </Form.Item>
-
-                    <Form.Item
-                        label="用户名"
-                        name="name"
-                        rules={[{required: true, message: '请输入用户名'}]}
-                    >
-                        <Input  disabled/>
-                    </Form.Item>
-
-                    <Form.Item
-                        label='邮箱'
-                        name='email'
-                        rules={[{type: 'email', message: '邮箱格式错误'}]}
-                    >
-                        <Input placeholder='邮箱'/>
-                    </Form.Item>
-
-                    <Form.Item>
-                        <Button type='primary' onClick={form.submit}>
-                            保存
-                        </Button>
-                    </Form.Item>
-                </Form>
+                            </Form.Item>
+                        </Form>
+                    </div>
+                </Card>
             </div>
-        </div>
+        </PageContainer>
     );
 };
 
