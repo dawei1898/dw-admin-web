@@ -11,7 +11,7 @@ import WorkbenchIndex from "../pages/dashboard/workbench/WorkbenchIndex.tsx";
 import AnalysisIndex from "../pages/dashboard/analysis/AnalysisIndex.tsx";
 import HomeIndex from "../pages/home/HomeIndex.tsx";
 import UserManageIndex from "../pages/system/user";
-
+import RoleManageIndex from "../pages/system/role/RoleManageIndex.tsx";
 
 
 /**
@@ -20,11 +20,11 @@ import UserManageIndex from "../pages/system/user";
 function GeneralErrorBoundary() {
     const error: any = useRouteError();
     if (error.status === 403) {
-        return <NotAuthorizedPage />;
+        return <NotAuthorizedPage/>;
     } else if (error.status === 404) {
-        return <NotFoundPage />;
+        return <NotFoundPage/>;
     } else {
-        return <ErrorPage />;
+        return <ErrorPage/>;
     }
 }
 
@@ -67,6 +67,11 @@ const Router = createBrowserRouter([
                         Component: UserManageIndex,
                         handle: {breadcrumb: "用户管理"},
                     },
+                    {
+                        path: "role",
+                        Component: RoleManageIndex,
+                        handle: {breadcrumb: "角色管理"},
+                    },
 
                 ]
             },
@@ -98,10 +103,10 @@ const Router = createBrowserRouter([
         path: "/login",
         Component: LoginIndex,
     },
-     {
-         path: "/register",
-          Component: RegisterIndex,
-     }
+    {
+        path: "/register",
+        Component: RegisterIndex,
+    }
 
 ])
 
