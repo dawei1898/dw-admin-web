@@ -1,8 +1,8 @@
 import React, {useEffect, useState} from 'react';
 import {
-    Button,
+    Button, Card,
     Divider, Flex, Input,
-    message,
+    message, Modal,
     Popconfirm,
     Space, Table,
     type TableColumnsType,
@@ -14,6 +14,7 @@ import {deleteLoginLogAPI, getLoginLogListAPI} from "../../../apis/loginLogApi.t
 import type {SorterResult} from "antd/es/table/interface";
 import {SORT_ASC, SORT_DESC, STATUS_ENABLED} from "../../../types/constant.ts";
 import {DeleteOutlined, ReloadOutlined, SearchOutlined} from "@ant-design/icons";
+import Breadcrumbs from "../../../components/Breadcrumbs.tsx";
 
 
 const initSearchParams = {
@@ -40,7 +41,7 @@ const LoginLogIndex = () => {
 
 
     /**
-     * 初始化加载角色列表
+     * 初始化加载数据列表
      */
     useEffect(() => {
             getLoginLogList(searchParams)
@@ -51,8 +52,7 @@ const LoginLogIndex = () => {
     );
 
 
-
-    // 获取角色列表
+    // 获取数据列表
     const getLoginLogList = async (param: LoginLogSearchParam) => {
         try {
             setLoading(true)
@@ -68,7 +68,6 @@ const LoginLogIndex = () => {
                 current: resp.data.pageNum,
                 pageSize: resp.data.pageSize,
                 total: Number(resp.data.total),
-                showTotal: (total) => `共 ${total} 条数据`,
             }))
         } finally {
             setLoading(false)
@@ -88,7 +87,7 @@ const LoginLogIndex = () => {
     }
 
     // 处理单个删除
-    const handleDelete =  async (id: string)  => {
+    const handleDelete = async (id: string) => {
         if (id) {
             const resp = await deleteLoginLogAPI(id);
             if (resp.code === 200) {
@@ -113,13 +112,13 @@ const LoginLogIndex = () => {
                 }
                 message.success('删除成功');
             } finally {
-                //setSelectedIds([])
+                setSelectedIds([])
                 await handleReset();
             }
         }
     };
 
-    
+
     // 选中的行数据
     const rowSelection: TableProps<LoginLogVO>['rowSelection'] = {
         columnWidth: 50,
@@ -145,10 +144,9 @@ const LoginLogIndex = () => {
         if (pagination) {
             setPagination((pre) => ({
                 ...pre,
-                //showTotal: (total) => `共 ${total} 条数据`,
             }))
-            pageNum= pagination.current || 1;
-            pageSize = pagination.pageSize ||  10;
+            pageNum = pagination.current || 1;
+            pageSize = pagination.pageSize || 10;
         }
 
         // 排序
@@ -247,77 +245,111 @@ const LoginLogIndex = () => {
 
     return (
         <div>
+            {/* 面包屑 */}
+            <Breadcrumbs/>
+
             {/* 登录日志列表 */}
             <div className='h-full p-6 flex flex-col gap-4'>
-                <Flex justify='space-between' style={{marginBottom: 20}}>
-                    <Space size={30}>
-                        <Space>
-                            <span>用户名:</span>
-                            <Input
-                                placeholder='用户名'
-                                value={searchParams.username}
-                                onChange={(e) => {
-                                    setSearchParams((pre) => ({
-                                        ...pre,
-                                         username: e.target.value,
-                                    }))
-                                }}
-                            />
+                <Card>
+                    <Flex justify='space-between'>
+                        <Space size={30}>
+                            <Space>
+                                <span>用户名:</span>
+                                <Input
+                                    placeholder='用户名'
+                                    value={searchParams.username}
+                                    onChange={(e) => {
+                                        setSearchParams((pre) => ({
+                                            ...pre,
+                                            username: e.target.value,
+                                        }))
+                                    }}
+                                />
+                            </Space>
+
+                            <Space>
+                                <span>登录IP:</span>
+                                <Input
+                                    placeholder='登录IP'
+                                    value={searchParams.ipAddr}
+                                    onChange={(e) => {
+                                        setSearchParams((pre) => ({
+                                            ...pre,
+                                            ipAddr: e.target.value,
+                                        }))
+                                    }}
+                                />
+                            </Space>
                         </Space>
 
                         <Space>
-                            <span>登录IP:</span>
-                            <Input
-                                placeholder='登录IP'
-                                value={searchParams.ipAddr}
-                                onChange={(e) => {
-                                    setSearchParams((pre) => ({
-                                        ...pre,
-                                        ipAddr: e.target.value,
-                                    }))
-                                }}
-                            />
+                            <Button onClick={handleReset}>
+                                <ReloadOutlined/>
+                                重置
+                            </Button>
+                            <Button type='primary' onClick={handleSearch}>
+                                <SearchOutlined/>
+                                搜索
+                            </Button>
                         </Space>
-                    </Space>
 
-                    <Space>
-                        <Button onClick={handleReset}>
-                            <ReloadOutlined/>
-                            重置
-                        </Button>
-                        <Button type='primary' onClick={handleSearch}>
-                            <SearchOutlined/>
-                            搜索
-                        </Button>
-                    </Space>
+                    </Flex>
+                </Card>
 
-                </Flex>
+                <Card>
 
-                <Flex gap={8}>
-                    <Popconfirm
-                        title={'确定要删除这些数据吗？'}
-                        onConfirm={handleBatchDelete}
-                        disabled={!selectedIds.length}
-                    >
-                        <Button type='primary' danger>
-                            <DeleteOutlined/>
-                            删除
-                        </Button>
-                    </Popconfirm>
-                </Flex>
 
-                <div>
-                    <Table
-                        style={{height: '100%'}}
-                        columns={columns}
-                        rowKey={(record) => record.id!}
-                        dataSource={data}
-                        pagination={pagination}
-                        loading={loading}
-                        rowSelection={rowSelection}
-                        onChange={handleChange}
-                    />
-                </div>
+                    <Flex vertical gap={20}>
+                        <Flex justify='end' gap={8}>
+                            <Button
+                                type='primary'
+                                danger
+                                disabled={selectedIds.length < 1}
+                                onClick={() => {
+                                    Modal.confirm({
+                                        title: '删除登录日志',
+                                        content: '此操作将永久删除这些数据，是否继续？',
+                                        okText: '删除',
+                                        okButtonProps: {
+                                            danger: true,
+                                        },
+                                        onOk: handleBatchDelete,
+                                    })
+                                }}
+                            >
+                                <DeleteOutlined/>
+                                批量删除
+                            </Button>
+
+                            {/*<Popconfirm
+                                title={'确定要删除这些数据吗？'}
+                                onConfirm={handleBatchDelete}
+                                disabled={!selectedIds.length}
+                            >
+                                <Button type='primary' danger>
+                                    <DeleteOutlined/>
+                                    批量删除
+                                </Button>
+                            </Popconfirm>*/}
+                        </Flex>
+
+                        <Table
+                            style={{height: '100%'}}
+                            columns={columns}
+                            rowKey={(record) => record.id!}
+                            dataSource={data}
+                            pagination={{
+                                ...pagination,
+                                showTotal: (total) => `共 ${total} 条数据`,
+                                showSizeChanger: true,
+                                showQuickJumper: true
+                            }}
+                            loading={loading}
+                            rowSelection={rowSelection}
+                            onChange={handleChange}
+                        />
+                    </Flex>
+                </Card>
             </div>
         </div>
     );
