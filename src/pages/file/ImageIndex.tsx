@@ -18,7 +18,7 @@ import {
 import type {UserParam, UserVO} from "../../types/users.ts";
 import Breadcrumbs from "../../components/Breadcrumbs.tsx";
 import AddRoleForm from "../system/role/AddRoleForm.tsx";
-import type {FileVO} from "../../types/files.ts";
+import type {FileParam, FileVO} from "../../types/files.ts";
 
  
 
@@ -27,13 +27,13 @@ import type {FileVO} from "../../types/files.ts";
  */
 const ImageIndex = () => {
     const [messageApi, contextHolder] = message.useMessage();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType | null>(null);
 
 
     /**
      * 查询图片列表
      */
-    const handleRequest = async (params, sort, filter) => {
+    const handleRequest = async (params: any, sort: any, filter: any) => {
         console.log("request params:", params, ", sort: ", sort, ", filter: ", filter)
 
         let createTimeSort = '';
@@ -160,7 +160,9 @@ const ImageIndex = () => {
                         title='确定要删除该图片吗？'
                         onConfirm={async () => {
                             await handleDelete(record.id!)
-                            await action?.reset()
+                            if (action) {
+                                action.reset?.()
+                            }
                         }}
                     >
                         <Button
@@ -188,7 +190,7 @@ const ImageIndex = () => {
                 }}
             >
                 {/* 图片列表 */}
-                <ProTable<UserVO, UserParam>
+                <ProTable<FileVO, FileParam>
                     actionRef={actionRef}
                     columns={columns}
                     rowKey={(record) => record.id!}
@@ -207,9 +209,11 @@ const ImageIndex = () => {
                         <Popconfirm
                             title={`确定要删除这 ${rows?.selectedRowKeys?.length} 条数据吗？`}
                             onConfirm={async () => {
-                                const ids = rows.selectedRows.map(r => r.id);
+                                const ids = rows?.selectedRows?.map(r => r.id || '') || [];
                                 await handleBatchDelete(ids)
-                                await action?.reset()
+                                if (action) {
+                                    action.reset?.()
+                                }
                             }}
                             disabled={!rows.selectedRowKeys?.length}
                         >

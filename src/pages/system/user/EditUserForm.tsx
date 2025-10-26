@@ -23,7 +23,7 @@ interface EditUserFormProps {
     //trigger: React.ReactNode;
     open: boolean;
     onOpen: (open: boolean) => void;
-    record: UserParam;
+    record?: UserParam | null;
     onFinish?: () => void;
 }
 
@@ -45,7 +45,7 @@ const EditUserForm = (
         console.log("初始化编辑用户框")
         if (open) {
             console.log("EditUserForm init record:", record)
-            const userId = record.id;
+            const userId = record?.id;
             if (userId) {
                 // 查询用户已配置的角色
                 getUserRoleListAPI(userId).then(resp => {
@@ -181,7 +181,7 @@ const EditUserForm = (
                 name='roles'
                 mode='multiple'
                 request={getAllRoleList}
-                onChange={(value: string[], option: RoleOption[]) => {
+                onChange={(value: string[], option) => {
                     // console.log('Select value:', value, ", option:", option)
                     form.setFieldValue('roles', option)
                 }}

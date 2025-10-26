@@ -16,15 +16,15 @@ import EditUserForm from "./EditUserForm.tsx";
  * 用户管理
  */
 const UserManage = () => {
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType | null>(null);
     const [openEdit, setOpenEdit] = useState(false)
-    const [editRecord, setEditRecord] = useState<UserVO>(null)
+    const [editRecord, setEditRecord] = useState<UserVO | null>(null)
 
 
     /**
      * 查询用户列表
      */
-    const handleRequest = async (params, sort, filter) => {
+    const handleRequest = async (params: any, sort:any, filter: any) => {
         //console.log("request params:", params, ", sort: ", sort, ", filter: ", filter)
 
         let createTimeSort = '';
@@ -148,7 +148,9 @@ const UserManage = () => {
                         title='确定要删除该用户吗？'
                         onConfirm={async () => {
                             await handleDelete(record.id!)
-                            await action?.reset()
+                            if (actionRef?.current) {
+                                await actionRef.current.reload()
+                            }
                         }}
                     >
                         <Button
@@ -203,13 +205,16 @@ const UserManage = () => {
             tableAlertRender={false} // 关闭多选项的选择结果
             headerTitle='用户列表'
             toolBarRender={(action, rows) => [
-                <>{rows.selectedRowKeys?.length > 0 && (
+                <>{rows.selectedRowKeys && rows.selectedRows && rows.selectedRowKeys?.length > 0 && (
                         <Popconfirm
                             title={`确定要删除这 ${rows?.selectedRowKeys?.length} 条数据吗？`}
                             onConfirm={async () => {
-                                const ids = rows.selectedRows.map(r => r.id);
+                                const ids = rows.selectedRows?.map(r => r.id || '') || [];
                                 await handleBatchDelete(ids)
-                                await action?.reset()
+                                if (action) {
+                                    await action.reload()
+                                }
+
                             }}
                             disabled={!rows.selectedRowKeys?.length}
                         >

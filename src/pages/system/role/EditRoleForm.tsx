@@ -5,7 +5,6 @@ import {
     ProFormText
 } from "@ant-design/pro-components";
 import {Form, message} from "antd";
-import type {RoleParam} from "../../../types/users.ts";
 import { saveRoleAPI} from "../../../apis/roleApi.ts";
 import {STATUS_DISABLED, STATUS_ENABLED} from "../../../types/constant.ts";
 import type {RoleParam} from "../../../types/roles.ts";
@@ -15,7 +14,7 @@ import type {RoleParam} from "../../../types/roles.ts";
 interface EditRoleFormProps {
     open: boolean;
     onOpen: (open: boolean) => void;
-    record: RoleParam;
+    record: RoleParam | null;
     onFinish?: () => void;
 }
 
@@ -38,7 +37,9 @@ const EditRoleForm = (
         if (open) {
             // 打开弹框
             console.log("EditRoleForm init record:", record)
-            form.setFieldsValue(record);
+            if (record) {
+                form.setFieldsValue(record);
+            }
         } else {
             // 关闭弹框
             form.resetFields()

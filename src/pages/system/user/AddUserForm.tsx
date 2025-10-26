@@ -149,7 +149,7 @@ const AddUserForm = ({onFinish}: AddUserFormProps) => {
                 name='roles'
                 mode='multiple'
                 request={getRoleList}
-                onChange={(value: string[], option: RoleOption[]) => {
+                onChange={(value: string[], option) => {
                     // console.log('Select value:', value, ", option:", option)
                     form.setFieldValue('roles', option)
                 }}

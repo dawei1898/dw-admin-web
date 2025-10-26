@@ -5,7 +5,7 @@ import type {UserParam, UserVO} from "../../../types/users.ts";
 import {Button, Divider, message, Popconfirm, Space, Tag} from "antd";
 import {DeleteOutlined} from "@ant-design/icons";
 import {SORT_ASC, SORT_DESC, STATUS_DISABLED, STATUS_ENABLED} from "../../../types/constant.ts";
-import type {RoleVO} from "../../../types/roles.ts";
+import type {RoleParam, RoleVO} from "../../../types/roles.ts";
 import {deleteRoleAPI, getRoleListAPI} from "../../../apis/roleApi.ts";
 import EditRoleForm from "./EditRoleForm.tsx";
 import AddRoleForm from "./AddRoleForm.tsx";
@@ -16,15 +16,15 @@ import AddRoleForm from "./AddRoleForm.tsx";
 const RoleManageIndex = () => {
 
     const [messageApi, contextHolder] = message.useMessage();
-    const actionRef = useRef<ActionType>();
+    const actionRef = useRef<ActionType | null>(null);
     const [openEdit, setOpenEdit] = useState(false)
-    const [editRecord, setEditRecord] = useState<RoleVO>(null)
+    const [editRecord, setEditRecord] = useState<RoleVO| null>(null)
 
 
     /**
      * 查询角色列表
      */
-    const handleRequest = async (params, sort, filter) => {
+    const handleRequest = async (params: any, sort: any, filter: any) => {
         console.log("request params:", params, ", sort: ", sort, ", filter: ", filter)
 
         let createTimeSort = '';
@@ -93,7 +93,7 @@ const RoleManageIndex = () => {
     };
 
 
-    const columns: ProColumns<UserVO>[] = [
+    const columns: ProColumns<RoleVO>[] = [
         {
             title: '角色码',
             dataIndex: 'roleCode',
@@ -168,7 +168,9 @@ const RoleManageIndex = () => {
                         title='确定要删除该角色吗？'
                         onConfirm={async () => {
                             await handleDelete(record.id!)
-                            await action?.reset()
+                            if (action) {
+                                action.reset?.()
+                            }
                         }}
                     >
                         <Button
@@ -208,7 +210,7 @@ const RoleManageIndex = () => {
                 />
 
                 {/* 角色列表 */}
-                <ProTable<UserVO, UserParam>
+                <ProTable<RoleVO, RoleParam>
                     actionRef={actionRef}
                     columns={columns}
                     rowKey={(record) => record.id!}
@@ -224,13 +226,15 @@ const RoleManageIndex = () => {
                     tableAlertRender={false} // 关闭多选项的选择结果
                     headerTitle='角色列表'
                     toolBarRender={(action, rows) => [
-                        <>{rows.selectedRowKeys?.length > 0 && (
+                        <>{rows.selectedRows && rows.selectedRowKeys && rows.selectedRowKeys?.length > 0 && (
                             <Popconfirm
-                                title={`确定要删除这 ${rows?.selectedRowKeys?.length} 条数据吗？`}
+                                title={`确定要删除这 ${rows.selectedRowKeys?.length} 条数据吗？`}
                                 onConfirm={async () => {
-                                    const ids = rows.selectedRows.map(r => r.id);
+                                    const ids = rows.selectedRows?.map(r => r.id || '') || [];
                                     await handleBatchDelete(ids)
-                                    await action?.reset()
+                                    if (action) {
+                                        action.reset?.()
+                                    }
                                 }}
                                 disabled={!rows.selectedRowKeys?.length}
                             >
