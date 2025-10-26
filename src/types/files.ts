@@ -3,17 +3,22 @@ import type {PageParam} from "./index";
 
 // 搜索文件入参
 export interface FileSearchParam extends PageParam {
-    fileName?: string;
+    name?: string;
+    type?: string;
+    path?: string;
     createTimeSort?: string;
+    updateTimeSort?: string;
 }
 
 // 文件入参
 export interface FileParam {
-    fileId?: string;
-    fileName: string;
-    fileType: string;
-    filePath: string;
-    fileUrl: string;
+    id?: string;
+    name: string;
+    type: string;
+    size: string;
+    path: string;
+    url: string;
+
 }
 
 // 文件返参

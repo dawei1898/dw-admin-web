@@ -12,6 +12,7 @@ import AnalysisIndex from "../pages/dashboard/analysis/AnalysisIndex.tsx";
 import HomeIndex from "../pages/home/HomeIndex.tsx";
 import UserManageIndex from "../pages/system/user";
 import RoleManageIndex from "../pages/system/role/RoleManageIndex.tsx";
+import ImageIndex from "../pages/file/ImageIndex.tsx";
 
 
 /**
@@ -75,7 +76,17 @@ const Router = createBrowserRouter([
 
                 ]
             },
-
+            {
+                path: "file",
+                handle: {breadcrumb: "文件管理"},
+                children: [
+                     {
+                         path: "image",
+                         Component: ImageIndex,
+                         handle: {breadcrumb: "图片管理"},
+                     }
+                ]
+            }
         ]
     },
     {

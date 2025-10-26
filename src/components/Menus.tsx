@@ -65,7 +65,7 @@ const items: MenuItem[] = [
         children: [
             {
                 key: '3-1',
-                label: <NavLink to="/file/image"> 图片 </NavLink>,
+                label: <NavLink to="/file/image"> 图片管理 </NavLink>,
             },
         ],
     },
