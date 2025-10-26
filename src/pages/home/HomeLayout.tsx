@@ -1,14 +1,18 @@
 import React, {useState} from 'react';
-import {ProCard, ProConfigProvider, ProLayout, PageContainer} from "@ant-design/pro-components";
-import {Button, Flex, theme} from "antd";
+import {
+    ProConfigProvider,
+    ProLayout,
+    PageContainer,
+} from "@ant-design/pro-components";
+import {theme} from "antd";
 import Logo from "../../components/Logo.tsx";
 import UserDropMenu from "./UserDropMenu.tsx";
 import LogoTitle from "../../components/LogoTitle.tsx";
 import {useThemeStore} from "../../stores/themeStore.ts";
 import HeaderActions from "../../components/HeaderActions.tsx";
-import Breadcrumbs from "../../components/Breadcrumbs.tsx";
 import Menus from "../../components/Menus.tsx";
 import {Outlet} from "react-router";
+import Breadcrumbs from "../../components/Breadcrumbs.tsx";
 
 
 const {useToken} = theme;
@@ -21,8 +25,7 @@ const {useToken} = theme;
 const HomeLayout = () => {
     const {token} = useToken();
     const {dark} = useThemeStore();
-
-
+    const [pathname, setPathname] = useState('/')
 
     return (
         <div>
@@ -32,15 +35,15 @@ const HomeLayout = () => {
             >
                 <ProLayout
                     token={{
+                        colorPrimary: '#1677ff', // 品牌色
                         pageContainer: {
-                            paddingInlinePageContainerContent: 20, // page左右内距
-                            paddingBlockPageContainerContent: 50, // page上下内距
+                            paddingInlinePageContainerContent: 40, // page左右内距
+                            paddingBlockPageContainerContent: 30, // page上下内距
                         }
                     }}
-                    pure={false} // 是否删除默认布局
-                    //navTheme={dark ? 'realDark' : 'light'}
-                    layout='mix'
-                    siderWidth={220}
+                    locale={'zh-CN'}
+                    layout='mix' // 布局模式
+                    siderWidth={220} // 侧边栏宽度
                     logo={<Logo/>}
                     // logo 标题
                     headerTitleRender={(logo, title, props) => {
@@ -60,17 +63,26 @@ const HomeLayout = () => {
                     menuContentRender={(props) => {
                         return <Menus/>
                     }}
-                >
 
-                    <PageContainer
-                        // 面包屑
-                        breadcrumbRender={(route) => {
-                            return <Breadcrumbs/>
-                        }}
-                    >
-                        {/* 路由切入点 */}
-                        <Outlet/>
-                    </PageContainer>
+                    // pure={false} // 是否删除默认布局
+                    // navTheme={dark ? 'realDark' : 'light'} // 主题样式
+                    //  {...defaultProps}
+                    //  location={{ pathname, }}
+                    //  splitMenus={true} // 分割菜单
+                    /* headerContentRender={(props) => {
+                       // 顶部面包屑
+                        return <ProBreadcrumb/>
+                    }} */
+                    /* menuItemRender={(item, dom) => {
+                        return <div onClick={() => {setPathname(item.path as string || '/')}}>
+                            <Link to={item.path as string || '/'}>
+                                {dom}
+                            </Link>
+                        </div>
+                    }} */
+                >
+                    {/* 路由切入点 */}
+                    <Outlet/>
 
                 </ProLayout>
             </ProConfigProvider>

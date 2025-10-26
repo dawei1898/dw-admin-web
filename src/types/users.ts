@@ -7,6 +7,7 @@ import type {RoleParam} from "./roles.ts";
 export interface UserSearchParam extends PageParam {
     name?: string;
     email?: string;
+    phone?: string;
     createTimeSort?: string;
     updateTimeSort?: string;
 }
@@ -16,6 +17,7 @@ export interface UserParam {
     id?: string;
     name: string;
     email?: string;
+    phone?: string;
     avatarUrl?: string;
     roles?: RoleParam[];
 }

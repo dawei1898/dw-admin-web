@@ -10,6 +10,7 @@ import HomeLayout from "../pages/home/HomeLayout.tsx";
 import WorkbenchIndex from "../pages/dashboard/workbench/WorkbenchIndex.tsx";
 import AnalysisIndex from "../pages/dashboard/analysis/AnalysisIndex.tsx";
 import HomeIndex from "../pages/home/HomeIndex.tsx";
+import UserManageIndex from "../pages/system/user";
 
 
 
@@ -57,7 +58,18 @@ const Router = createBrowserRouter([
                     },
                 ]
             },
+            {
+                path: "system",
+                handle: {breadcrumb: "系统管理"},
+                children: [
+                    {
+                        path: "user",
+                        Component: UserManageIndex,
+                        handle: {breadcrumb: "用户管理"},
+                    },
 
+                ]
+            },
 
         ]
     },

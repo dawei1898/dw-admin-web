@@ -1,11 +1,12 @@
 import React from 'react';
 import Breadcrumbs from "../../../components/Breadcrumbs.tsx";
-import { PageContainer } from '@ant-design/pro-components';
+import {PageContainer} from "@ant-design/pro-components";
+import UserManage from "./UserManage.tsx";
 
 /**
- * 分析页
+ * 用户管理首页
  */
-const AnalysisIndex = () => {
+const UserManageIndex = () => {
     return (
         <div>
             <PageContainer
@@ -14,12 +15,10 @@ const AnalysisIndex = () => {
                     return <Breadcrumbs/>
                 }}
             >
-                <p>分析页</p>
-
+                <UserManage/>
             </PageContainer>
-
         </div>
     );
 };
 
-export default AnalysisIndex;
+export default UserManageIndex;

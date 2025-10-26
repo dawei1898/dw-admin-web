@@ -1,27 +1,29 @@
 import React from 'react';
-import {ProCard} from "@ant-design/pro-components";
+import {PageContainer, ProCard} from "@ant-design/pro-components";
 
 const HomeIndex = () => {
     return (
         <div>
-            <p>首页</p>
-            <ProCard
-                style={{
-                    height: '20vh',
-                    minHeight: 100,
-                }}
-            >
-                <div />
-            </ProCard>
+            <PageContainer>
+                <p>首页</p>
+                <ProCard
+                    style={{
+                        height: '20vh',
+                        minHeight: 100,
+                    }}
+                >
+                    <div/>
+                </ProCard>
 
-            <ProCard
-                style={{
-                    height: '80vh',
-                    minHeight: 100,
-                }}
-            >
-                <div />
-            </ProCard>
+                <ProCard
+                    style={{
+                        height: '80vh',
+                        minHeight: 100,
+                    }}
+                >
+                    <div/>
+                </ProCard>
+            </PageContainer>
         </div>
     );
 };
