@@ -1,0 +1,59 @@
+# 利用 Github Action 构建并推送镜像 到 Github package
+
+# 工作流配置：构建并推送Docker镜像到GitHub Container Registry
+# 触发条件：推送到master分支或手动触发
+name: Build & Push Docker Image
+
+on:
+  # push 到 master 分支触发
+  push:
+    branches: ['master']
+  # 页面手动触发
+  workflow_dispatch:
+
+# 环境变量配置
+# REGISTRY: GitHub Container Registry地址
+# IMAGE_NAME: 镜像名称，使用当前仓库名
+env:
+  REGISTRY: ghcr.io
+  IMAGE_NAME: ${{ github.repository }}
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    # 配置工作流权限
+    # contents: read - 读取仓库内容权限
+    # packages: write - 写入包（容器镜像）权限
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      # 克隆仓库代码
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # 登录 GHCR
+      - name: Login to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # 生成日期标签
+      - name: Generate date tag
+        id: date
+        run: echo "date=$(date +'%Y-%m-%d')" >> $GITHUB_OUTPUT
+
+      # 从 Dockerfile 构建 Docker 镜像
+      # 推送四个标签：latest、commit SHA、日期、分支名
+      - name: Build & Push Image
+        uses: docker/build-push-action@v5
+        with:
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository }}:latest
+            ghcr.io/${{ github.repository }}:${{ github.ref_name }}
+            ghcr.io/${{ github.repository }}:${{ github.sha }}
+            ghcr.io/${{ github.repository }}:${{ steps.date.outputs.date }}
